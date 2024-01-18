@@ -1,0 +1,24 @@
+name: Build
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build-vs-solution:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+      - name: Build for release
+        run: msbuild test\test.sln -t:rebuild -p:Configuration=Release -p:Platform=x64
+      - name: Run
+        run: test\x64\Release\test.exe
+  build-command-line:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build command line
+        shell: cmd
+        run: build.bat
+
