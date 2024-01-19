@@ -56,3 +56,46 @@ cl.exe test\test.cpp std.obj /std:c++latest /MD /EHsc /nologo /W4 /Fe"test.exe"
 ```
 
 See the "build-command-line" job in [build.yml](https://github.com/bluetarpmedia/cppmodulestest/blob/main/.github/workflows/build.yml) and the [build.bat](https://github.com/bluetarpmedia/cppmodulestest/blob/main/build.bat) file.
+
+## Modules feature test macros
+
+There are two relevant feature test macros related to C++ modules:
+- `__cpp_modules`: indicates whether the compiler supports C++ modules
+- `__cpp_lib_modules`: indicates whether `import std;` and `import std.compat;` are available
+
+C++ Language feature test macros (like `__cpp_modules`) are predefined in each translation unit by the compiler. You can use `__cpp_modules` without needing to `#include` or `import` anything.
+
+However, C++ Library feature test macros (like `__cpp_lib_modules`) are defined in header files and C++ modules **do not** import macros from header files.
+
+This behaviour may be surprising:
+```
+import std;
+
+int main()
+{
+#ifdef __cpp_modules
+    // Yes!
+#endif
+
+#ifdef __cpp_lib_modules
+    // No!
+#endif
+}
+```
+
+The solution is to `#include <version>` first:
+```
+#include <version>
+import std;
+
+int main()
+{
+#ifdef __cpp_modules
+    // Yes!
+#endif
+
+#ifdef __cpp_lib_modules
+    // Yes!
+#endif
+}
+```
